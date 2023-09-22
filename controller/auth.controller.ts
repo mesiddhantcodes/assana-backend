@@ -1,0 +1,1 @@
+const User=require('../interfaces/User.interface');
