@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDatabase = exports.connectToDatabase = void 0;
 const mongodb_1 = require("mongodb");
-const db = new mongodb_1.MongoClient("mongodb+srv://assnaAdmin:Asna123@cluster0.phbuxbe.mongodb.net/assna-clone?retryWrites=true&w=majority");
+// const db=new MongoClient("mongodb+srv://assnaAdmin:Asna123@cluster0.phbuxbe.mongodb.net/assna-clone?retryWrites=true&w=majority");
+const db = new mongodb_1.MongoClient("mongodb://0.0.0.0:27017/asana-clone");
 const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield db.connect();

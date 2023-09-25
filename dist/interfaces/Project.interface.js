@@ -7,7 +7,6 @@ const createProject = (name, description, createdBy) => {
         id: (0, snowflake_1.generateId)(),
         name,
         description,
-        // tasks: [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy,
