@@ -5,24 +5,28 @@ interface User {
     name:string;
     email:string;
     password:string;
-    username:string;
+    userName:string;
     projects:string[];
     createdAt:Date;
     updatedAt:Date;
     
 }
 
-export const registerUser=(username:string,email:string,password:string,name:string):User=>{
+export const registerUser=(name: string,email: string,password: string,userName: string):User=>{
     return {
         id:generateId(),
         name,
         email,
         password,
-        username,
+        userName,
         projects:[],
         createdAt:new Date(),
         updatedAt:new Date()
     }
 }
+
+
+
+
 
 export default User;

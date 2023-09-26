@@ -27,6 +27,10 @@ const AuthController = {
             if (!(yield (0, bcrypt_1.comparePassword)(password, userExists.password))) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
+            user.id = userExists.id;
+            user.name = userExists.name;
+            user.userName = userExists.userName;
+            user.email = userExists.email;
             const AccessToken = (0, Authentication_middleware_1.generateJWT)(user);
             res.status(200).json({
                 status: true,
@@ -47,22 +51,29 @@ const AuthController = {
     },
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = req.body;
-            var user_ = (0, User_interface_1.registerUser)(user.username, user.email, user.password, user.name);
-            const db = (0, db_1.getDatabase)();
-            const userCollection = db.collection('users');
-            const userExists = yield userCollection.findOne({ email: user_.email });
-            if (userExists) {
-                return res.status(409).json({ message: 'User already exists' });
+            try {
+                const { name, email, password, userName } = req.body;
+                var user_ = (0, User_interface_1.registerUser)(name, email, password, userName);
+                const db = (0, db_1.getDatabase)();
+                const userCollection = db.collection('users');
+                const userExists = yield userCollection.findOne({ email: email });
+                if (userExists) {
+                    return res.status(409).json({ message: 'User already exists' });
+                }
+                const userNameTaken = yield userCollection.findOne({ userName: userName });
+                if (userNameTaken) {
+                    return res.status(409).json({ message: 'Username already taken' });
+                }
+                const password_ = password;
+                user_.password = yield (0, bcrypt_1.encryptPassword)(password_);
+                yield userCollection.insertOne(user_);
+                return res.status(201).json({ message: 'User created' });
             }
-            const userNameTaken = yield userCollection.findOne({ username: user_.username });
-            if (userNameTaken) {
-                return res.status(409).json({ message: 'Username already taken' });
+            catch (error) {
+                // console.error(error);
+                // console.log(error);
+                return res.status(500).json({ message: 'Internal server error' });
             }
-            const password_ = user_.password;
-            user_.password = yield (0, bcrypt_1.encryptPassword)(password_);
-            yield userCollection.insertOne(user_);
-            return res.status(201).json({ message: 'User created' });
         });
     },
 };

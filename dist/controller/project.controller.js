@@ -15,12 +15,34 @@ const Columns_interface_1 = require("../interfaces/Columns.interface");
 const ProjectController = {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const project = req.body;
-            var project_ = (0, Project_interface_1.createProject)(project.name, project.description, project.createdBy);
-            let db = (0, db_1.getDatabase)();
-            const ProjectCollection = db.collection('projects');
-            ProjectCollection.insertOne(project_);
-            res.send(Object.assign(Object.assign({}, project_), { "message": "project created" }));
+            try {
+                const { name, description } = req.body;
+                const createdBy = req.user.id;
+                console.log(req.user);
+                var project_ = (0, Project_interface_1.createProject)(name, description, createdBy);
+                let db = (0, db_1.getDatabase)();
+                const ProjectCollection = db.collection('projects');
+                const UserCollection = db.collection('users');
+                const user = yield UserCollection.findOne({ id: createdBy });
+                if (!user) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+                if (user.projects.includes(project_.id)) {
+                    return res.send(Object.assign(Object.assign({}, project_), { "message": "project created" }));
+                }
+                yield UserCollection.updateOne({ id: createdBy }, {
+                    $set: {
+                        projects: [...user.projects, project_.id]
+                    }
+                });
+                yield ProjectCollection.insertOne(project_);
+                res.send(Object.assign(Object.assign({}, project_), { "message": "project created" }));
+            }
+            catch (error) {
+                // console.error(error);
+                // console.log(error);
+                return res.status(500).json({ message: 'Internal server error' });
+            }
         });
     },
     getProjectById(req, res) {
@@ -81,10 +103,9 @@ const ProjectController = {
             }
             var colmun_ = (0, Columns_interface_1.createColumn)(projectId, name);
             yield columnCollection.insertOne(colmun_);
-            ifProjectExists.columns.push(colmun_.id);
             yield projectCollection.updateOne({ id: projectId }, {
                 $set: {
-                    columns: ifProjectExists.columns
+                    columns: [...ifProjectExists.columns, colmun_.id]
                 }
             });
             res.send(Object.assign(Object.assign({}, colmun_), { "message": "column created" }));

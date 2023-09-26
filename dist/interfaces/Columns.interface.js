@@ -8,7 +8,8 @@ const createColumn = (projectId, name) => {
         name: name,
         createdAt: new Date(),
         updatedAt: new Date(),
-        projectId
+        projectId,
+        tasks: []
     };
 };
 exports.createColumn = createColumn;

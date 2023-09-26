@@ -1,10 +1,8 @@
 import { generateId } from "../utils/snowflake";
-
 interface Project {
     id: string;
     name: string;
     description: string;
-    // tasks: string[];
     createdAt: Date;
     updatedAt: Date;
     createdBy: string;
@@ -19,7 +17,7 @@ export const createProject = (name: string, description: string, createdBy: stri
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy,
-        columns: [] 
+        columns: []
     }
 }
 

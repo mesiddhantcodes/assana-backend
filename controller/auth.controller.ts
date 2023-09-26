@@ -17,6 +17,13 @@ const AuthController = {
         if (!await comparePassword(password, userExists.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+        
+        user.id = userExists.id;
+        user.name = userExists.name;
+        user.userName = userExists.userName;
+        user.email = userExists.email;
+
+
         const AccessToken = generateJWT(user);
         res.status(200).json({
             status: true,
@@ -34,23 +41,31 @@ const AuthController = {
         });;
     },
     async register(req: Request, res: Response) {
-        const user: User = req.body;
-        var user_=registerUser(user.username,user.email,user.password,user.name);
-        const db = getDatabase();
-        const userCollection = db.collection('users');
-        const userExists = await userCollection.findOne({ email: user_.email });
-        if (userExists) {
-            return res.status(409).json({ message: 'User already exists' });
-        }
-        const userNameTaken = await userCollection.findOne({ username: user_.username });
-        if (userNameTaken) {
-            return res.status(409).json({ message: 'Username already taken' });
-        }
-        const password_ = user_.password;
-        user_.password = await encryptPassword(password_);
-        await userCollection.insertOne(user_);
-        return res.status(201).json({ message: 'User created' });
+        try {
 
+            const { name, email, password, userName } = req.body;
+            var user_ = registerUser(name, email, password, userName);
+           
+            const db = getDatabase();
+            const userCollection = db.collection('users');
+            const userExists = await userCollection.findOne({ email: email });
+            if (userExists) {
+                return res.status(409).json({ message: 'User already exists' });
+            }
+            const userNameTaken = await userCollection.findOne({ userName: userName });
+            if (userNameTaken) {
+                return res.status(409).json({ message: 'Username already taken' });
+            }
+            const password_ = password;
+            user_.password = await encryptPassword(password_);
+            await userCollection.insertOne(user_);
+            return res.status(201).json({ message: 'User created' });
+        }
+        catch (error) {
+            // console.error(error);
+            // console.log(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
 
     },
 };

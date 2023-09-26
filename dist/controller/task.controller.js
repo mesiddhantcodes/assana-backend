@@ -17,21 +17,17 @@ const taskController = {
             try {
                 const task = req.body;
                 let db = (0, db_1.getDatabase)();
-                var task_ = (0, Task_interface_1.createTask)(task.name, task.deadline, task.priority, task.projectId);
+                const createdBy = req.user.id;
+                var task_ = (0, Task_interface_1.createTask)(task.name, task.deadline, task.priority, createdBy, task.columnId);
                 const TaskCollection = db.collection('tasks');
-                const ProjectCollection = db.collection('projects');
-                const project = yield ProjectCollection.findOne({ id: task.projectId });
-                if (!project) {
-                    return res.status(404).json({ message: 'Project not found' });
-                }
-                project.tasks.push(task_.id);
-                yield ProjectCollection.updateOne({ id: task_.projectId }, {
-                    $set: {
-                        tasks: project.tasks
+                const ColumnsCollection = db.collection('columns');
+                yield ColumnsCollection.updateOne({ id: task.columnId }, {
+                    $push: {
+                        //just push the task id in the column
+                        tasks: task_.id
                     }
                 });
-                yield TaskCollection.insertOne(task_);
-                res.send({ "message": "task created" });
+                res.send(Object.assign(Object.assign({}, task_), { "message": "task created" }));
             }
             catch (error) {
                 console.error(error);

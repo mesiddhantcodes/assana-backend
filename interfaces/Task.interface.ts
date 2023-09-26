@@ -6,19 +6,21 @@ interface Task {
     updatedAt: Date;
     deadline: Date;
     priority: string;
-    projectId: string;
+    createdBy:string;
+    columnId:string;
+    
 }
 
-export const createTask = (name: string, deadline: Date, priority: string, projectId: string): Task => {
+export const createTask = (name: string, deadline: Date, priority: string, createdBy:string,columnId:string): Task => {
     return {
         id: generateId(),
         name,
-
         createdAt: new Date(),
         updatedAt: new Date(),
         deadline,
         priority,
-        projectId
+        createdBy,
+        columnId
     }
 }
 

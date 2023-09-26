@@ -4,12 +4,13 @@ import User from '../interfaces/User.interface';
 const JWT_SECRET="sfbdfjhbglfdgjbfdgbfdbgljfdfdljgljdf";
 
 export const generateJWT = (user: User): string => {
+    
     return jwt.sign(
         {
             id: user.id,
             name: user.name,
             email: user.email,
-            username: user.username,
+            userName: user.userName,
         },
         JWT_SECRET,
         {

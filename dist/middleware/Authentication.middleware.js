@@ -11,7 +11,7 @@ const generateJWT = (user) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        username: user.username,
+        userName: user.userName,
     }, JWT_SECRET, {
         expiresIn: '1h',
     });

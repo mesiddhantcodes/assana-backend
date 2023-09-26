@@ -10,25 +10,22 @@ const taskController = {
         try {
             const task: Task = req.body;
             let db = getDatabase();
-            var task_ = createTask(task.name, task.deadline, task.priority, task.projectId);
-
+            const createdBy = req.user.id;
+            var task_ = createTask(task.name, task.deadline, task.priority,createdBy,task.columnId);
             const TaskCollection = db.collection('tasks');
-            const ProjectCollection = db.collection('projects');
-            const project = await ProjectCollection.findOne({ id: task.projectId });
-            if (!project) {
-                return res.status(404).json({ message: 'Project not found' });
-            }
-            project.tasks.push(task_.id);
-            await ProjectCollection.updateOne(
-                {id: task_.projectId},
+            const ColumnsCollection = db.collection('columns');
+
+            await ColumnsCollection.updateOne(
+                { id: task.columnId},
                 {
-                    $set:
+                    $push:
                     {
-                        tasks: project.tasks
+                        //just push the task id in the column
+                        tasks:task_.id 
+
                     }
                 });
-            await TaskCollection.insertOne(task_);
-            res.send({ "message": "task created" });
+            res.send({ ...task_, "message": "task created" });
         } catch (error) {
             console.error(error);
             console.log(error);

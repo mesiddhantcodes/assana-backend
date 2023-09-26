@@ -6,6 +6,7 @@ interface Columns{
     createdAt:Date;
     updatedAt:Date;
     projectId:string;
+    tasks:string[];
 }
 
 export const createColumn = (projectId:string,name:string):Columns=>{
@@ -14,7 +15,8 @@ export const createColumn = (projectId:string,name:string):Columns=>{
         name:name,
         createdAt:new Date(),
         updatedAt:new Date(),
-        projectId
+        projectId,
+        tasks:[]
     }
 }
 

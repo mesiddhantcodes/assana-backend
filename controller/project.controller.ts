@@ -7,12 +7,40 @@ import { createColumn } from "../interfaces/Columns.interface";
 const ProjectController = {
 
     async create(req: Request, res: Response) {
-        const project: Project = req.body;
-        var project_ = createProject(project.name, project.description, project.createdBy);
-        let db = getDatabase();
-        const ProjectCollection = db.collection('projects');
-        ProjectCollection.insertOne(project_);
-        res.send({ ...project_, "message": "project created" });
+        try {
+            
+            const {name,description}=req.body;
+            const createdBy = req.user.id;
+            console.log(req.user);
+
+            var project_ = createProject(name, description, createdBy);
+            
+            let db = getDatabase();
+            const ProjectCollection = db.collection('projects');
+            const UserCollection=db.collection('users');
+            const user=await UserCollection.findOne({id:createdBy});
+            if(!user){
+                return res.status(404).json({ message: 'User not found' });
+            }
+            if(user.projects.includes(project_.id)){
+                return res.send({ ...project_, "message": "project created" });
+            }
+            await UserCollection.updateOne(
+                { id: createdBy },
+                {
+                    $set:
+                    {
+                        projects: [...user.projects,project_.id]
+                    }
+                });
+            await ProjectCollection.insertOne(project_);
+            res.send({ ...project_, "message": "project created" });
+        }
+        catch (error) {
+            // console.error(error);
+            // console.log(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
     },
     async getProjectById(req: Request, res: Response) {
         const { projectId } = req.params;
@@ -70,15 +98,15 @@ const ProjectController = {
         }
         var colmun_ = createColumn(projectId, name);
         await columnCollection.insertOne(colmun_);
-        ifProjectExists.columns.push(colmun_.id);
         await projectCollection.updateOne(
             { id: projectId },
             {
                 $set:
                 {
-                    columns: ifProjectExists.columns
+                    columns: [...ifProjectExists.columns, colmun_.id]
                 }
             });
+      
         res.send({ ...colmun_, "message": "column created" });
 
 
