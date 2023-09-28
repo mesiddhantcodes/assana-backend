@@ -68,6 +68,9 @@ const ProjectController = {
                 return res.status(404).json({ message: 'Project not found' });
             }
             const columns = yield ColumnsCollection.find({ projectId: projectId }).toArray();
+            columns.sort((a, b) => {
+                return a.updatedAt.getTime() - b.updatedAt.getTime();
+            });
             res.send(columns);
         });
     },
@@ -132,6 +135,16 @@ const ProjectController = {
                 }
             });
             res.send({ project: ifColumnExists, "message": "column updated" });
+        });
+    },
+    moveColumn(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { initialColumnId, targetColumnId } = req.body;
+            const result = (0, Columns_interface_1.moveColumnById)(initialColumnId, targetColumnId);
+            if ((yield result).success) {
+                return res.send({ "message": "column moved" });
+            }
+            return res.status(404).json({ message: 'Column not found' });
         });
     }
 };

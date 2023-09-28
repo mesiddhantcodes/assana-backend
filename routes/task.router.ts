@@ -8,4 +8,5 @@ const router = Router();
 router.post('/',verifyJWTMiddleware, taskController.create);
 router.get('/:taskId',verifyJWTMiddleware, taskController.get);
 router.put('/:taskId', verifyJWTMiddleware,taskController.updateTask);
+router.patch('/moveTask', verifyJWTMiddleware,taskController.moveTask);
 export default router;

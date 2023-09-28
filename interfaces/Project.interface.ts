@@ -1,4 +1,6 @@
+import { getDatabase } from "../utils/db";
 import { generateId } from "../utils/snowflake";
+import { Request,Response } from "express";
 interface Project {
     id: string;
     name: string;
@@ -20,5 +22,7 @@ export const createProject = (name: string, description: string, createdBy: stri
         columns: []
     }
 }
+
+
 
 export default Project;

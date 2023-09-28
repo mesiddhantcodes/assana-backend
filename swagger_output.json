@@ -5,7 +5,7 @@
     "title": "REST API",
     "description": ""
   },
-  "host": "localhost:3000",
+  "host": "192.168.3.218:3000",
   "basePath": "/",
   "schemes": [
     "http"
@@ -245,6 +245,44 @@
         }
       }
     },
+    "/project/moveColumn": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "initialColumnId": {
+                  "example": "any"
+                },
+                "targetColumnId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/task/": {
       "post": {
         "description": "",
@@ -372,6 +410,47 @@
         }
       }
     },
+    "/task/moveTask": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "initialColumnId": {
+                  "example": "any"
+                },
+                "targetColumnId": {
+                  "example": "any"
+                },
+                "taskId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "description": "",
@@ -386,15 +465,6 @@
                   "example": "any"
                 },
                 "password": {
-                  "example": "any"
-                },
-                "id": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "req": {
                   "example": "any"
                 }
               }

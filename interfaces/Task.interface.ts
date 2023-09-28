@@ -1,3 +1,4 @@
+import { getDatabase } from "../utils/db";
 import { generateId } from "../utils/snowflake";
 interface Task {
     id: string;
@@ -24,4 +25,47 @@ export const createTask = (name: string, deadline: Date, priority: string, creat
     }
 }
 
+export const moveTaskById = async (initialColumnId: string, targetColumnId: string, taskId: string) => {
+    const db = getDatabase();
+    const ColumnCollection = db.collection('columns');
+    const initialColumn = await ColumnCollection.findOne({ id: initialColumnId });
+    const targetColumn = await ColumnCollection.findOne({ id: targetColumnId });
+    if (!initialColumn) {
+        return {
+            message: 'Initial column not found',
+            success: false
+        };
+    }
+    if (!targetColumn) {
+        return {
+            message: 'Target column not found',
+            success: false
+        };
+    }
+    // pop taskid from initial column
+    await ColumnCollection.updateOne(
+        { id: initialColumnId },
+        {
+            $pull:
+            {
+                tasks: taskId
+            }
+        });
+    // push taskid to target column
+    await ColumnCollection.updateOne(
+        { id: targetColumnId },
+        {
+            $push:
+            {
+                tasks: taskId
+            }
+        });
+
+    return {
+        message: 'Task moved',
+        success: true
+    };
+
+
+}
 export default Task;

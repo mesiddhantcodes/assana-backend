@@ -16,21 +16,28 @@ const bcrypt_1 = require("../utils/bcrypt");
 const AuthController = {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = req.body;
+            // const user: User = req.body;
+            const { email, password } = req.body;
             const db = (0, db_1.getDatabase)();
             const userCollection = db.collection('users');
-            const userExists = yield userCollection.findOne({ email: user.email });
+            const userExists = yield userCollection.findOne({ email: email });
             if (!userExists) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            const password = user.password;
-            if (!(yield (0, bcrypt_1.comparePassword)(password, userExists.password))) {
+            const password_ = password;
+            if (!(yield (0, bcrypt_1.comparePassword)(password_, userExists.password))) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-            user.id = userExists.id;
-            user.name = userExists.name;
-            user.userName = userExists.userName;
-            user.email = userExists.email;
+            const user = {
+                id: userExists.id,
+                name: userExists.name,
+                email: userExists.email,
+                password: userExists.password,
+                userName: userExists.userName,
+                projects: userExists.projects,
+                createdAt: userExists.createdAt,
+                updatedAt: userExists.updatedAt
+            };
             const AccessToken = (0, Authentication_middleware_1.generateJWT)(user);
             res.status(200).json({
                 status: true,

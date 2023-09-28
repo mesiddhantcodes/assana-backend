@@ -10,4 +10,5 @@ const router = (0, express_1.Router)();
 router.post('/', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.create);
 router.get('/:taskId', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.get);
 router.put('/:taskId', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.updateTask);
+router.patch('/moveTask', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.moveTask);
 exports.default = router;

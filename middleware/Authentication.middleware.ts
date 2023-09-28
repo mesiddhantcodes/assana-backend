@@ -1,16 +1,17 @@
 
 import jwt from 'jsonwebtoken';
 import User from '../interfaces/User.interface';
-const JWT_SECRET="sfbdfjhbglfdgjbfdgbfdbgljfdfdljgljdf";
+const JWT_SECRET = "sfbdfjhbglfdgjbfdgbfdbgljfdfdljgljdf";
 
 export const generateJWT = (user: User): string => {
-    
+
     return jwt.sign(
         {
             id: user.id,
             name: user.name,
             email: user.email,
             userName: user.userName,
+            
         },
         JWT_SECRET,
         {
@@ -30,7 +31,6 @@ export const verifyJWT = (token: string): User | null => {
 
 export const verifyJWTMiddleware = (req: any, res: any, next: any) => {
     const token = req.headers.authorization?.split(' ')[1];
-
     if (!token) {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
     }

@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Task_interface_1 = require("../interfaces/Task.interface");
 const db_1 = require("../utils/db");
+const Task_interface_2 = require("../interfaces/Task.interface");
 const taskController = {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -82,6 +83,16 @@ const taskController = {
                 console.log(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
+        });
+    },
+    moveTask(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { initialColumnId, targetColumnId, taskId } = req.body;
+            const result = (0, Task_interface_2.moveTaskById)(initialColumnId, targetColumnId, taskId);
+            if ((yield result).success) {
+                return res.send({ "message": "column moved" });
+            }
+            return res.status(404).json({ message: 'Column not found' });
         });
     }
 };

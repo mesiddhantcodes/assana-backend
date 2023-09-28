@@ -3,26 +3,23 @@ import { Request, Response } from "express";
 import Project, { createProject } from "../interfaces/Project.interface";
 import { generateId } from "../utils/snowflake";
 import { getDatabase } from "../utils/db";
-import { createColumn } from "../interfaces/Columns.interface";
+import { moveColumnById, createColumn } from "../interfaces/Columns.interface";
 const ProjectController = {
 
     async create(req: Request, res: Response) {
         try {
-            
-            const {name,description}=req.body;
+            const { name, description } = req.body;
             const createdBy = req.user.id;
             console.log(req.user);
-
             var project_ = createProject(name, description, createdBy);
-            
             let db = getDatabase();
             const ProjectCollection = db.collection('projects');
-            const UserCollection=db.collection('users');
-            const user=await UserCollection.findOne({id:createdBy});
-            if(!user){
+            const UserCollection = db.collection('users');
+            const user = await UserCollection.findOne({ id: createdBy });
+            if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            if(user.projects.includes(project_.id)){
+            if (user.projects.includes(project_.id)) {
                 return res.send({ ...project_, "message": "project created" });
             }
             await UserCollection.updateOne(
@@ -30,7 +27,7 @@ const ProjectController = {
                 {
                     $set:
                     {
-                        projects: [...user.projects,project_.id]
+                        projects: [...user.projects, project_.id]
                     }
                 });
             await ProjectCollection.insertOne(project_);
@@ -46,6 +43,8 @@ const ProjectController = {
         const { projectId } = req.params;
         const db = getDatabase();
         const ProjectCollection = db.collection('projects');
+        
+
         const result = await ProjectCollection.findOne({ id: projectId });
         if (!result) {
             return res.status(404).json({ message: 'Project not found' });
@@ -62,6 +61,9 @@ const ProjectController = {
             return res.status(404).json({ message: 'Project not found' });
         }
         const columns = await ColumnsCollection.find({ projectId: projectId }).toArray();
+        columns.sort((a, b) => {
+            return a.updatedAt.getTime() - b.updatedAt.getTime();
+        });
         res.send(columns);
     },
     async updateProject(req: Request, res: Response) {
@@ -106,7 +108,7 @@ const ProjectController = {
                     columns: [...ifProjectExists.columns, colmun_.id]
                 }
             });
-      
+
         res.send({ ...colmun_, "message": "column created" });
 
 
@@ -135,9 +137,19 @@ const ProjectController = {
                 }
             });
         res.send({ project: ifColumnExists, "message": "column updated" });
+    },
 
+
+    async moveColumn(req: Request, res: Response) {
+        const { initialColumnId, targetColumnId } = req.body;
+        const result = moveColumnById(initialColumnId, targetColumnId);
+        if ((await result).success) {
+            return res.send({ "message": "column moved" });
+        }
+        return res.status(404).json({ message: 'Column not found' });
 
     }
+
 }
 
 export default ProjectController;

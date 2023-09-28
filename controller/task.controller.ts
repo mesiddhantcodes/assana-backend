@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Task, { createTask } from '../interfaces/Task.interface';
 import { generateId } from '../utils/snowflake';
 import { getDatabase } from '../utils/db';
+import { moveTaskById } from '../interfaces/Task.interface';
 
 
 
@@ -11,18 +12,17 @@ const taskController = {
             const task: Task = req.body;
             let db = getDatabase();
             const createdBy = req.user.id;
-            var task_ = createTask(task.name, task.deadline, task.priority,createdBy,task.columnId);
+            var task_ = createTask(task.name, task.deadline, task.priority, createdBy, task.columnId);
             const TaskCollection = db.collection('tasks');
             const ColumnsCollection = db.collection('columns');
 
             await ColumnsCollection.updateOne(
-                { id: task.columnId},
+                { id: task.columnId },
                 {
                     $push:
                     {
                         //just push the task id in the column
-                        tasks:task_.id 
-
+                        tasks: task_.id
                     }
                 });
             res.send({ ...task_, "message": "task created" });
@@ -79,8 +79,16 @@ const taskController = {
             return res.status(500).json({ message: 'Internal server error' });
         }
 
+    },
+    async moveTask(req: Request, res: Response) {
+        const { initialColumnId, targetColumnId, taskId } = req.body;
+        const result = moveTaskById(initialColumnId, targetColumnId, taskId);
+        if ((await result).success) {
+            return res.send({ "message": "column moved" });
+        }
+        return res.status(404).json({ message: 'Column not found' });
     }
-    
+
 
 
 };

@@ -6,24 +6,29 @@ import { generateJWT } from '../middleware/Authentication.middleware';
 import { comparePassword, encryptPassword } from '../utils/bcrypt';
 const AuthController = {
     async login(req: Request, res: Response) {
-        const user: User = req.body;
+        // const user: User = req.body;
+        const { email, password } = req.body;
         const db = getDatabase();
         const userCollection = db.collection('users');
-        const userExists = await userCollection.findOne({ email: user.email });
+        const userExists = await userCollection.findOne({ email: email });
         if (!userExists) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const password = user.password;
-        if (!await comparePassword(password, userExists.password)) {
+        const password_ = password;
+        if (!await comparePassword(password_, userExists.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+        const user: User = {
+            id: userExists.id,
+            name: userExists.name,
+            email: userExists.email,
+            password: userExists.password,
+            userName: userExists.userName,
+            projects: userExists.projects,
+            createdAt: userExists.createdAt,
+            updatedAt: userExists.updatedAt
+        };
         
-        user.id = userExists.id;
-        user.name = userExists.name;
-        user.userName = userExists.userName;
-        user.email = userExists.email;
-
-
         const AccessToken = generateJWT(user);
         res.status(200).json({
             status: true,
