@@ -148,7 +148,7 @@ const ProjectController = {
         }
         return res.status(404).json({ message: 'Column not found' });
 
-    }
+    },
 
 }
 
