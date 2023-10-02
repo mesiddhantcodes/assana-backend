@@ -28,7 +28,6 @@ const UserController =  {
             if (!result) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            // use aggregation to get all tasks
             const tasks=await userCollection.aggregate([
                 {
                     $match: { id: userId }
@@ -48,22 +47,35 @@ const UserController =  {
                 {
                     $lookup:
                     {
-                        from: "tasks",
-                        localField: "projects.tasks",
+                        from: "columns",
+                        localField: "projects.columns",
                         foreignField: "id",
-                        as: "projects.tasks"
+                        as: "projects.columns"
                     }
                 },
                 {
-                    $unwind: "$projects.tasks"
+                    $unwind: "$projects.columns"
+                },
+                {
+                    $lookup:
+                    {
+                        from: "tasks",
+                        localField: "projects.columns.tasks",
+                        foreignField: "id",
+                        as: "projects.columns.tasks"
+                    }
+                },
+                {
+                    $unwind: "$projects.columns.tasks"
                 },
                 {
                     $project: {
-                        "projects.tasks": 1,
+                        "projects.columns.tasks": 1,
                         _id: 0
                     }
                 }
             ]).toArray();
+
             
             console.log(tasks);
             

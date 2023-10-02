@@ -21,7 +21,8 @@ const createTask = (name, deadline, priority, createdBy, columnId) => {
         deadline,
         priority,
         createdBy,
-        columnId
+        columnId,
+        assignedTo: []
     };
 };
 exports.createTask = createTask;

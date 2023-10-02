@@ -9,6 +9,7 @@ interface Task {
     priority: string;
     createdBy:string;
     columnId:string;
+    assignedTo:string[];
     
 }
 
@@ -21,7 +22,9 @@ export const createTask = (name: string, deadline: Date, priority: string, creat
         deadline,
         priority,
         createdBy,
-        columnId
+        columnId,
+        assignedTo:[]
+
     }
 }
 

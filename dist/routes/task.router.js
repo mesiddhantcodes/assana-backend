@@ -11,4 +11,6 @@ router.post('/', Authentication_middleware_1.verifyJWTMiddleware, task_controlle
 router.get('/:taskId', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.get);
 router.put('/:taskId', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.updateTask);
 router.patch('/moveTask', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.moveTask);
+router.put('/user/assigntask', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.assignTaskToUser);
+router.get('/search/:name', Authentication_middleware_1.verifyJWTMiddleware, task_controller_1.default.searchTaskByName);
 exports.default = router;

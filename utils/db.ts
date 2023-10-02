@@ -1,8 +1,8 @@
 import { MongoClient } from "mongodb";
 
 
-const db=new MongoClient("mongodb+srv://assnaAdmin:Asna123@cluster0.phbuxbe.mongodb.net/assna-clone?retryWrites=true&w=majority");
-// const db=new MongoClient("mongodb://0.0.0.0:27017/asana-clone")
+// const db=new MongoClient("mongodb+srv://assnaAdmin:Asna123@cluster0.phbuxbe.mongodb.net/assna-clone?retryWrites=true&w=majority");
+const db=new MongoClient("mongodb://0.0.0.0:27017/asana-clone")
 
 export const connectToDatabase=async()=>{
     try{

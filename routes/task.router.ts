@@ -9,4 +9,6 @@ router.post('/',verifyJWTMiddleware, taskController.create);
 router.get('/:taskId',verifyJWTMiddleware, taskController.get);
 router.put('/:taskId', verifyJWTMiddleware,taskController.updateTask);
 router.patch('/moveTask', verifyJWTMiddleware,taskController.moveTask);
+router.put('/user/assigntask', verifyJWTMiddleware,taskController.assignTaskToUser);
+router.get('/search/:name', verifyJWTMiddleware,taskController.searchTaskByName);
 export default router;

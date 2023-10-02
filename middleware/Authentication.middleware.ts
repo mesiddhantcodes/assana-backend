@@ -11,7 +11,6 @@ export const generateJWT = (user: User): string => {
             name: user.name,
             email: user.email,
             userName: user.userName,
-            
         },
         JWT_SECRET,
         {
