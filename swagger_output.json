@@ -50,6 +50,9 @@
           "200": {
             "description": "OK"
           },
+          "201": {
+            "description": "Created"
+          },
           "401": {
             "description": "Unauthorized"
           },

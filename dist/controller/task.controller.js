@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Task_interface_1 = require("../interfaces/Task.interface");
 const db_1 = require("../utils/db");
 const Task_interface_2 = require("../interfaces/Task.interface");
+const redis_1 = __importDefault(require("../utils/redis"));
 const taskController = {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -158,25 +162,26 @@ const taskController = {
             try {
                 const { name } = req.params;
                 const userId = req.user.id;
-                console.log(userId);
+                if (yield redis_1.default.exists(name)) {
+                    const result = yield redis_1.default.get(name);
+                    return res.send(result);
+                }
                 const db = (0, db_1.getDatabase)();
                 const TaskCollection = db.collection('tasks');
                 const result = yield TaskCollection.find({ createdBy: userId }).toArray();
                 if (!result) {
                     return res.status(404).json({ message: 'Task not found' });
                 }
-                // const taskResult = result.filter((task) => {
-                //     return task.name.includes(name)
-                // })
-                // give task that matches name and rank them according to similarity of  name found and given name
                 const taskResult = result.map((task) => {
                     return Object.assign(Object.assign({}, task), { rank: task.name.length - name.length });
                 }).sort((a, b) => {
                     return a.rank - b.rank;
                 });
+                yield redis_1.default.set(name, JSON.stringify(taskResult.splice(0, 10)));
                 res.send(taskResult.splice(0, 10));
             }
             catch (error) {
+                console.error(error);
                 return res.status(500).json({ message: 'Internal server error' });
             }
         });

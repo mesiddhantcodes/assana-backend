@@ -6,6 +6,7 @@ import AuthRouter from './routes/auth.router';
 import { serve, setup } from 'swagger-ui-express';
 import bodyParser from 'body-parser';
 import UserRouter from './routes/user.router';
+import RedisClient from './utils/redis';
 
 const cors = require('cors');
 // import cors from 'cors';
@@ -16,12 +17,19 @@ const port = 3000;
 connectToDatabase();
 app.use(express.json());
 app.use(cors());
+RedisClient.connect().then(() => {
+    console.log('Redis connected');
+}
+).catch((err) => {
+    console.log(err);
+});
+
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/project', ProjectRouter);
 app.use('/task', TaskRouter);
 app.use('/auth', AuthRouter);
-app.use('/user',UserRouter);
+app.use('/user', UserRouter);
 app.use('/swagger', serve, setup(require('../swagger_output.json')));
 app.get('/', (req, res) => {
     res.send('Hello, Express.js with TypeScript!');

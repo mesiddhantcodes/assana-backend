@@ -18,7 +18,7 @@ const ProjectController = {
             try {
                 const { name, description } = req.body;
                 const createdBy = req.user.id;
-                console.log(req.user);
+                // console.log(req.user);
                 var project_ = (0, Project_interface_1.createProject)(name, description, createdBy);
                 let db = (0, db_1.getDatabase)();
                 const ProjectCollection = db.collection('projects');
@@ -28,7 +28,7 @@ const ProjectController = {
                     return res.status(404).json({ message: 'User not found' });
                 }
                 if (user.projects.includes(project_.id)) {
-                    return res.send(Object.assign(Object.assign({}, project_), { "message": "project created" }));
+                    return res.status(200).json(Object.assign(Object.assign({}, project_), { "message": "project already exists" }));
                 }
                 yield UserCollection.updateOne({ id: createdBy }, {
                     $set: {
@@ -36,11 +36,12 @@ const ProjectController = {
                     }
                 });
                 yield ProjectCollection.insertOne(project_);
-                res.send(Object.assign(Object.assign({}, project_), { "message": "project created" }));
+                // console.log(res.statusCode);
+                // res.send({ ...project_, "message": "project created" });
+                return res.status(201).json(Object.assign(Object.assign({}, project_), { "message": "Project created successfully" }));
             }
             catch (error) {
-                // console.error(error);
-                // console.log(error);
+                // console.log(res.statusCode)
                 return res.status(500).json({ message: 'Internal server error' });
             }
         });

@@ -11,6 +11,7 @@ const auth_router_1 = __importDefault(require("./routes/auth.router"));
 const swagger_ui_express_1 = require("swagger-ui-express");
 const body_parser_1 = __importDefault(require("body-parser"));
 const user_router_1 = __importDefault(require("./routes/user.router"));
+const redis_1 = __importDefault(require("./utils/redis"));
 const cors = require('cors');
 // import cors from 'cors';
 const app = (0, express_1.default)();
@@ -18,6 +19,11 @@ const port = 3000;
 (0, db_1.connectToDatabase)();
 app.use(express_1.default.json());
 app.use(cors());
+redis_1.default.connect().then(() => {
+    console.log('Redis connected');
+}).catch((err) => {
+    console.log(err);
+});
 app.use(body_parser_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/project', project_router_1.default);

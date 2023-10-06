@@ -10,7 +10,7 @@ const ProjectController = {
         try {
             const { name, description } = req.body;
             const createdBy = req.user.id;
-            console.log(req.user);
+            // console.log(req.user);
             var project_ = createProject(name, description, createdBy);
             let db = getDatabase();
             const ProjectCollection = db.collection('projects');
@@ -20,8 +20,9 @@ const ProjectController = {
                 return res.status(404).json({ message: 'User not found' });
             }
             if (user.projects.includes(project_.id)) {
-                return res.send({ ...project_, "message": "project created" });
+                return res.status(200).json({ ...project_, "message": "project already exists" });
             }
+            console.log(UserCollection);
             await UserCollection.updateOne(
                 { id: createdBy },
                 {
@@ -31,11 +32,13 @@ const ProjectController = {
                     }
                 });
             await ProjectCollection.insertOne(project_);
-            res.send({ ...project_, "message": "project created" });
+            // console.log(res.statusCode);
+            // res.send({ ...project_, "message": "project created" });
+            return res.status(201).json({ ...project_, "message": "Project created successfully" });
         }
         catch (error) {
-            // console.error(error);
-            // console.log(error);
+            // console.log(res.statusCode)
+            console.log(error)
             return res.status(500).json({ message: 'Internal server error' });
         }
     },
@@ -43,7 +46,7 @@ const ProjectController = {
         const { projectId } = req.params;
         const db = getDatabase();
         const ProjectCollection = db.collection('projects');
-        
+
 
         const result = await ProjectCollection.findOne({ id: projectId });
         if (!result) {

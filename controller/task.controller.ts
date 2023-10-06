@@ -3,6 +3,7 @@ import Task, { createTask } from '../interfaces/Task.interface';
 import { generateId } from '../utils/snowflake';
 import { getDatabase } from '../utils/db';
 import { moveTaskById } from '../interfaces/Task.interface';
+import RedisClient from '../utils/redis';
 
 
 
@@ -151,23 +152,33 @@ const taskController = {
         try {
             const { name } = req.params;
             const userId = req.user.id;
-            console.log(userId
-            );
+        
+            if (await RedisClient.exists(name)) {
+                const result = await RedisClient.get(name);
+                return res.send(result);
+            }
             const db = getDatabase();
             const TaskCollection = db.collection('tasks');
-            const result = await TaskCollection.find({  createdBy: userId }).toArray();
+            const result = await TaskCollection.find({ createdBy: userId }).toArray();
             if (!result) {
                 return res.status(404).json({ message: 'Task not found' });
             }
+      
+            
             const taskResult = result.map((task) => {
                 return { ...task, rank: task.name.length - name.length }
             }).sort((a, b) => {
                 return a.rank - b.rank;
-            })
+            });
+            await RedisClient.set(name, JSON.stringify(taskResult.splice(0, 10)));
+
+
+
+
 
             res.send(taskResult.splice(0, 10));
         } catch (error) {
-
+                console.error(error);
             return res.status(500).json({ message: 'Internal server error' });
         }
     }
